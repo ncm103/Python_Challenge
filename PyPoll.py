@@ -9,30 +9,35 @@ import os
 import csv
 
 #set file path
-csvpath = os.path.join("Resources", "election_data.csv")
+file_to_load = os.path.join("Resources", "election_data.csv")
+file_to_output = os.path.join("analysis", "election_analysis.txt")
+
+candidate_options = []
+votes_earned = {}
 
 #acknowledge header
-csv_header = next(csvreader)
-first_row = next(csvreader)
-votes_list.append(first_row[0])
+#csv_header = next(csvreader)
+#first_row = next(csvreader)
+#candidate_options.append(first_row[0])
 
 total_votes = 0
 
-candidate_options = []
-candidate_votes = {}
-
 #counter for votes and candidates
-winning_candidate = ""
+winner = ""
 winning_count = 0
 
 #read and open csv
 with open(file_to_load) as election_data:
-    reader = csv.DictReader(election_data)
+    csvreader = csv.DictReader(election_data)
 
+    #acknowledge header
+    csv_header = next(csvreader)
+    first_row = next(csvreader)
+    #candidate_options.append(first_row[0])
 
-    for row in reader:
+    for row in csvreader:
 
-        print(". ", end=""),
+        #print(". ", end=""),
 
         total_votes = total_votes + 1
 
@@ -43,9 +48,9 @@ with open(file_to_load) as election_data:
         if candidate_name not in candidate_options:
 
             candidate_options.append(candidate_name)
-            candidate_votes[candidate_name] = 0
+            votes_earned[candidate_name] = 0
 
-        candidate_votes[candidate_name] = candidate_votes[candidate_name] + 1
+        votes_earned[candidate_name] = votes_earned[candidate_name] + 1
 
 #print results in text file
 with open(file_to_output, "w") as txt_file:
@@ -53,25 +58,23 @@ with open(file_to_output, "w") as txt_file:
     #print final vote counts formatted 
     election_results = (
         f"\nElection Results\n"
-        f"-------------------------\n"
-        f"Total Votes: {total_votes}\n"
-        f"-------------------------\n")
+        f"Total Votes: {total_votes}\n")
     print(election_results, end="")
 
     #save final vote count to text file
     txt_file.write(election_results)
 
     #Find the winner loop
-    for candidate in candidate_votes:
+    for candidate in votes_earned:
 
         #get vote count and %
-        votes = candidate_votes.get(candidate)
+        votes = votes_earned.get(candidate)
         vote_percentage = float(votes) / float(total_votes) * 100
 
         #Find winning candidate
         if (votes > winning_count):
             winning_count = votes
-            winning_candidate = candidate
+            winner = candidate
 
         #Print output
         voter_output = f"{candidate}: {vote_percentage:.3f}% ({votes})\n"
@@ -81,11 +84,9 @@ with open(file_to_output, "w") as txt_file:
         txt_file.write(voter_output)
 
     #Print the winner's name and info
-    winning_candidate_summary = (
-        f"-------------------------\n"
-        f"Winner: {winning_candidate}\n"
-        f"-------------------------\n")
-    print(winning_candidate_summary)
+    winner_summary = (
+        f"Winner: {winner}\n")
+    print(winner_summary)
 
     #Save to the text file
-    txt_file.write(winning_candidate_summary)
+    txt_file.write(winner_summary)
